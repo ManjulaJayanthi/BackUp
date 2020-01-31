@@ -1,0 +1,18 @@
+{
+  "name": "manjulaworkspace",
+  "version": "1.0.0",
+  "description": "",
+  "main": "PromiseAllSettled.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^25.1.0"
+  },
+  "dependencies": {
+    "crocks": "^0.12.4",
+    "curry": "^1.2.0"
+  }
+}
