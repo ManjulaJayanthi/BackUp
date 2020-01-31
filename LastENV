@@ -1,0 +1,72 @@
+// Same file reading task
+const env = require('dotenv').config();
+
+const fs = require('fs')
+const path = require('path')
+
+
+const Async = require('crocks/Async')
+const map = require('crocks/pointfree/map')
+const chain = require('crocks/pointfree/chain')
+const compose = require('crocks/helpers/compose')
+const maybe = require('crocks/Maybe')
+const either = require('crocks/Either')
+const { isTruthy } = require('crocks/predicates')
+const { ifElse } = require('crocks/logic')
+
+//console.log(env.parsed.ENV_FILENAME)
+
+const { Just, Nothing } = maybe
+const { Right, Left } = either
+
+const safe = pred =>
+    ifElse(pred, Just, Nothing)
+
+const err = (val) => console.log('error ' + val)
+
+//const variableExist = (val) => val //console.log(val + ' Value Exist')
+
+//envValuesExist(env.parsed.ENV_FILENAME)
+
+const readFileAsync = (fileName) => {
+    return Async((rej, res) => {
+        (fs.readFile)(path.join(__dirname, fileName), 'utf8', (err, data) => {
+            return err ? rej(err) : res(data)
+        })
+    })
+}
+
+const writeFileAsync = (content) => {
+    return Async((rej, res) => {
+        (fs.writeFile)(path.join(__dirname, 'result.txt'), content, (err) => {
+            return err ? rej(err) : res('File Saved')
+        })
+    })
+}
+
+// const validate = (fileArray) => {
+//     return Async.all(
+//         fileArray.map((file) => {
+//             return readFileAsync(file)
+//         }))
+// }
+
+const envValuesExist = compose(
+    Nothing,
+    Just,
+    safe(isTruthy)
+)
+
+const validateFiles = compose(
+    chain(writeFileAsync),
+    Async.all,
+    map(readFileAsync),
+    envValuesExist
+)
+
+validateFiles(env.parsed.ENV_FILENAME)
+//envValuesExist(env.parsed.ENV_FILENAME);
+//validateFiles.fork(console.log, console.error)
+
+// validateFiles(fileArray).fork()
+// validate(fileArray).chain(data => writeFileAsync(data)).fork(console.log, console.error)
